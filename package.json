@@ -1,0 +1,29 @@
+{
+  "name": "@hugo-fixit/skills",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
+    "prepare": "simple-git-hooks && git submodule update --init --recursive"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.13.2",
+    "eslint": "^9.27.0",
+    "jiti": "^2.7.0",
+    "lint-staged": "^16.0.0",
+    "markdownlint-cli2": "^0.23.2",
+    "simple-git-hooks": "^2.12.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,ts,mjs,mts}": "eslint --fix",
+    "*.md": "markdownlint-cli2 --fix"
+  }
+}

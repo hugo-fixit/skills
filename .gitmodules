@@ -1,0 +1,6 @@
+[submodule "sources/FixIt"]
+	path = sources/FixIt
+	url = https://github.com/hugo-fixit/FixIt
+[submodule "sources/fixit-docs"]
+	path = sources/fixit-docs
+	url = https://github.com/hugo-fixit/fixit-docs

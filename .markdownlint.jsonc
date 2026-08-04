@@ -1,0 +1,39 @@
+{
+  "default": true,
+  "ul-style": {
+    "style": "dash"
+  },
+  "ul-indent": {
+    "indent": 2
+  },
+  "no-hard-tabs": {
+    "spaces_per_tab": 2
+  },
+  "line-length": false,
+  "no-duplicate-header": {
+    "allow_different_nesting": true
+  },
+  "single-title": {
+    "front_matter_title": "^\\s*title\\s*[:=]"
+  },
+  "no-trailing-punctuation": {
+    "punctuation": ".,;:"
+  },
+  "no-blanks-blockquote": false,
+  "ol-prefix": {
+    "style": "ordered"
+  },
+  "no-bare-urls": false,
+  "fenced-code-language": false,
+  "code-block-style": {
+    "style": "fenced"
+  },
+  "no-space-in-code": false,
+  "emphasis-style": {
+    "style": "underscore"
+  },
+  "strong-style": {
+    "style": "asterisk"
+  },
+  "table-column-style": false
+}

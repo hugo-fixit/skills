@@ -1,0 +1,10 @@
+{
+  "config": {
+    "extends": "./.markdownlint.jsonc"
+  },
+  "ignores": [
+    "node_modules",
+    ".git",
+    "sources"
+  ]
+}
