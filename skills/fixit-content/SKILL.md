@@ -76,10 +76,10 @@ Override any embedded shortcode by placing a file with the same name in `layouts
 ### Tabs with Code Blocks
 
 ```markdown
-{{</* tabs type="card" */>}}
-{{%/* tab title="HTML" */%}}<div>Hello</div>{{%/* /tab */%}}
-{{%/* tab title="JS" */%}}console.log('hi'){{%/* /tab */%}}
-{{</* /tabs */>}}
+{{< tabs type="card" >}}
+{{% tab title="HTML" %}}<div>Hello</div>{{% /tab %}}
+{{% tab title="JS" %}}console.log('hi'){{% /tab %}}
+{{< /tabs >}}
 ```
 
 ### Code Fence Extended (preferred over shortcodes)

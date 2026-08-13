@@ -17,3 +17,8 @@ Focus on:
 - Front matter page-level params
 
 Skip: Basic markdown syntax (bold, italic, headings), Hugo built-in shortcodes.
+
+Important rules:
+
+- Shortcode examples must use the actual shortcode syntax (`{{< >}}` / `{{% %}}`), NOT the Hugo documentation escaping syntax (`{{</* */>}}` / `{{%/* */%}}`). The skill is a reference for agents to write real content, not documentation that needs to be rendered by Hugo.
+- For shortcodes that process Markdown content (like `tab`, `fixit-encryptor`), use `{{% %}}` delimiters. For all others, use `{{< >}}` delimiters.

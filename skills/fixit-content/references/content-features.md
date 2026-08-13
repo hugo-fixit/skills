@@ -279,8 +279,8 @@ content/posts/my-post/
 Resources are referenced by filename in shortcodes:
 
 ```markdown
-{{</* image src="cover.jpg" */>}}
-{{</* echarts file="data/chart.yaml" */>}}
+{{< image src="cover.jpg" >}}
+{{< echarts file="data/chart.yaml" >}}
 ```
 
 ### Creating Content with Archetypes
