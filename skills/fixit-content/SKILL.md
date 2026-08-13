@@ -6,7 +6,7 @@ description: >
   Use when writing FixIt posts with advanced content features.
 metadata:
   author: hugo-fixit
-  version: 2026.8.4
+  version: 2026.8.13
   source: Generated from https://github.com/hugo-fixit/FixIt and https://github.com/hugo-fixit/fixit-docs
 ---
 
