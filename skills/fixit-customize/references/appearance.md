@@ -1,13 +1,16 @@
-<!-- Source: https://github.com/hugo-fixit/FixIt/blob/master/layouts/_partials/function/scss-vars.html -->
+<!-- source: layouts/_partials/function/scss-vars.html:27-108 -->
+<!-- source: hugo.toml:562-564 -->
 
 # Appearance Variables Reference
 
-All variables are set via `[params.appearance]` in `hugo.toml`. The theme converts them
-to SCSS variables through `layouts/_partials/function/scss-vars.html`, which then become
-CSS custom properties with the `--fi-` prefix.
+All variables below are set via `[params.appearance]` in `hugo.toml`. The theme merges
+them with defaults in `layouts/_partials/function/scss-vars.html`, passes the dict to
+SCSS via `hugo:vars`, and exposes them as CSS custom properties with the `--fi-` prefix.
 
-Color values must use hex format (e.g. `#ff0000`). CSS named colors (e.g. `red`) are not
-supported. Dark mode variants use the `_dark` suffix.
+**Color format**: prefer hex (e.g. `#ff0000`). CSS functions such as `rgba(...)` are
+allowed (several defaults use them). CSS named colors (e.g. `red`) are forbidden --
+Hugo's `isTypedCSSValue` only accepts hex, CSS functions, and CSS units. Dark mode
+variants use the `_dark` suffix.
 
 ## Global Typography
 
@@ -70,6 +73,8 @@ scrollbar_hover_color = "#7d7d7d"
 | `scrollbar_color` | `#a6a6a6` | -- |
 | `scrollbar_hover_color` | `#7d7d7d` | -- |
 
+Note the defaults are `rgba(...)` -- proof that non-hex CSS color functions are valid here.
+
 ## Header
 
 ```toml
@@ -80,7 +85,7 @@ header_title_font_size = "1.375rem"
 ```
 
 The header title font family defaults to `global_font_family`. The header height is
-defined in SCSS as `$header-height: 3.5rem`.
+defined in SCSS as `$header-height: 3.5rem` (not configurable via appearance).
 
 ## Menu
 
@@ -194,23 +199,56 @@ only when you need to break the default relationship.
 | `github_corner_fill` | `header_background_color_dark` |
 | `github_corner_fill_dark` | `header_background_color` |
 
-## Page Width
+## Page Width (page-level param)
 
-Page width is controlled by `page_style` under `[params.appearance]`:
+`page_style` is **not** an appearance variable. It is a top-level page-level param under
+`[params]` (or per-page front matter), read via `{{ .Param "page_style" }}` and applied
+as `data-page-style` on `.wrapper`:
 
 ```toml
-[params.appearance]
-page_style = "normal"  # narrow | normal | wide | custom
+# hugo.toml — top-level under [params]
+page_style = "normal"  # default: "normal"
 ```
 
-Built-in styles:
+Built-in values:
 
 - **narrow** -- Narrow page/toc width ratio
 - **normal** -- Default width ratio
 - **wide** -- Larger page/toc width ratio
 
-For a custom page style, use the `page-style` mixin in `assets/scss/custom.scss` and set
-`page_style = "custom"`. See [scss-variables.md](scss-variables.md) for mixin details.
+Any other string works if you define a matching `page-style` SCSS variant. Example for a
+custom style in `assets/scss/custom.scss`:
 
-For responsive breakpoints, use the `media` mixin. See [scss-variables.md](scss-variables.md)
-for breakpoint values and usage.
+```scss
+@include page-style('custom') {
+  @include media('xl') {
+    width: ROUND(70%, 2px);
+    max-width: 1600px;
+  }
+  @include media('lg') {
+    width: ROUND(60%, 2px);
+  }
+  @include media('md') {
+    width: ROUND(56%, 2px);
+  }
+}
+```
+
+Then set `page_style = "custom"` (site-wide or in a page's front matter). See
+[scss-variables.md](scss-variables.md) for mixin details.
+
+## Third-Party Assets
+
+To load external CSS/JS without a custom partial, use `[params.library]`:
+
+```toml
+[params.library.css]
+highlight = "https://cdn.example.com/highlight.css"
+
+[params.library.js]
+analytics = "js/analytics.js"  # local path relative to assets/
+```
+
+This is a real injection channel alongside `custom.scss`, `custom.ts`, and
+`custom_partials`. For responsive breakpoints, use the `media` mixin -- see
+[scss-variables.md](scss-variables.md).

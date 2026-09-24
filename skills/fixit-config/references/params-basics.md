@@ -59,6 +59,8 @@ These can be set in `[params]` as site-wide defaults, and overridden per-page vi
 [params]
 # Capitalize page titles
 capitalize_titles = true
+# Show summary as plain text (strip HTML/shortcodes)
+summary_plainify = false
 # Show author avatar on posts
 author_avatar = true
 # Enable lightgallery for images with titles (true), force all images ("force"), or disable (false)
@@ -97,6 +99,8 @@ twemoji = false
 collection_list = false
 # Collection navigation at end of post
 collection_navigation = false
+# End-of-post flag (HTML supported), e.g. "— END —"
+end_flag = ""
 ```
 
 ### Per-Page Front Matter Override
@@ -194,4 +198,76 @@ enable = true
 reminder = 90     # Show reminder if lastmod > 90 days ago
 warning = 180     # Show warning if lastmod > 180 days ago
 close_comment = false
+```
+
+## External Links
+
+```toml
+[params.link]
+external_icon = true  # auto icon for external links
+
+# Confirm before leaving the site
+[params.link.guard]
+enable = true
+mode = "modal"  # "modal" dialog, or "redirect" via /link/ intermediate page
+allow_domains = ["github.com"]  # exact host or parent domain, skips guard
+```
+
+## Breadcrumb & Post Navigation
+
+```toml
+[params.breadcrumb]
+enable = true
+sticky = true
+show_home = false
+separator = "/"
+capitalize = true
+
+[params.navigation]
+in_section = false  # prev/next limited to current section
+reverse = false     # reverse next/previous order
+```
+
+## Search
+
+Pick one engine via `type`. Extra sub-config only for the engine you use.
+
+```toml
+[params.search]
+enable = true
+type = "fuse"  # "fuse" | "algolia" | "pagefind" | "cse"
+content_length = 4000
+placeholder = ""
+max_result_length = 10
+snippet_length = 30
+highlight_tag = "em"
+absolute_url = false
+anchorify = true
+
+[params.search.fuse]     # when type = "fuse"
+threshold = 0.3
+min_match_char_length = 2
+
+[params.search.pagefind] # when type = "pagefind"
+bundle_path = "pagefind/"
+debounce_timeout_ms = 300
+use_built_in_filters = true
+sort_by = ""            # "" | "date" | "title"
+sort_order = "desc"
+
+[params.search.algolia]  # when type = "algolia"
+index = ""
+app_id = ""
+search_key = ""
+```
+
+Custom Search Engine (when `type = "cse"`):
+
+```toml
+[params.cse]
+engine = "google"  # "google" | "bing"
+results_page = "/search/"
+
+[params.cse.google]
+cx = ""  # or [params.cse.bing] cx = ""
 ```

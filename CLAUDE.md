@@ -27,6 +27,7 @@ skills/<name>/
 5. **Include code** — Every reference file must contain working, copy-pasteable code examples.
 6. **Explain why** — Cover not just how to configure something, but when and why to use specific options.
 7. **Source annotations** — Add HTML comments at the top of reference files: `<!-- source: <path>:<line-range> -->`
+8. **No shortcode escaping** — Write shortcodes in their real form (`{{< >}}` / `{{% %}}`), never Hugo docs escaping (`{{</* */>}}` / `{{%/* */%}}`). Skills are references for agents writing content, not Hugo-rendered docs. Use `{{% %}}` for shortcodes that process Markdown (e.g. `tab`, `fixit-encryptor`); `{{< >}}` for all others. Do not copy escaped examples from fixit-docs — unescape them.
 
 ## Source Priority
 

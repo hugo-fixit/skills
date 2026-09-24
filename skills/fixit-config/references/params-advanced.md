@@ -15,15 +15,14 @@ Override per-block via Markdown attributes: `` ```lang {mode="mac", max_shown_li
 wrapper = true
 # "classic" (header bar), "mac" (macOS style), "simple"
 mode = "classic"
-# Additional CSS classes
 wrapper_class = ""
 # Lines shown before "show more" kicks in
 max_shown_lines = 10
 # Shadow effect: "always", "hover", "never"
 shadow = "never"
 copyable = true
-downloadable = false
-fullscreen = false
+downloadable = false  # classic mode only
+fullscreen = false    # classic mode only
 line_nos_toggler = true
 line_wrap_toggler = true
 # Experimental inline editing
@@ -87,12 +86,10 @@ security_level = "loose"
 # "classic" or "handDrawn"
 look = "handDrawn"
 font_family = ""
-# ELK layout engine (optional)
+# ELK layout engine (optional; enables extra layout values)
 layout_loaders = []
 layout = "dagre"
 ```
-
-Use the `mermaid` shortcode in content:
 
 ```markdown
 {{< mermaid >}}
@@ -118,23 +115,30 @@ Use the `mapbox` shortcode in content.
 
 ## Encryption
 
-FixIt supports partial content encryption via the `fixit-decryptor` library.
-Configure in front matter, not in `hugo.toml`:
+Page encryption uses front matter (`password` required, `message` optional). Partial
+encryption uses the `fixit-encryptor` shortcode (not `encryption`).
 
 ```yaml
 ---
 title: "Encrypted Post"
 password: "my-secret-password"
+message: "Password is required"  # optional unlock prompt
 ---
 ```
 
-Wrap content to encrypt with the `encryption` shortcode:
+Wrap partial content to encrypt:
 
 ```markdown
-{{< encryption >}}
+{{% fixit-encryptor "my-secret-password" "Password is required" %}}
 This content is encrypted.
-{{< /encryption >}}
+{{% /fixit-encryptor %}}
+
+{{% fixit-encryptor password="my-secret-password" message="Password is required" %}}
+Named-params form.
+{{% /fixit-encryptor %}}
 ```
+
+Use the `{{% %}}` delimiter so inner Markdown renders before encryption. Supports nesting.
 
 ## Watermark
 
@@ -197,13 +201,15 @@ enable = true
 keep_static = false
 # Auto-collapse sidebar TOC
 auto = true
-position = "right"  # "left" or "right"
+position = "end"  # "start" or "end" — logical side in the aside layout
 ordered = false
 start_level = 2
 end_level = 6
 # Decrease H1 to H2 in content
 decrease_h1 = false
 ```
+
+Why `start`/`end`: values map to CSS logical properties (RTL-safe), not physical left/right.
 
 ## PostChat AI
 
@@ -219,8 +225,22 @@ add_button = true
 default_input = false
 upload_web = true
 show_invite_link = true
+hot_words = true
+user_title = ""
+user_desc = ""
+user_icon = ""          # magic mode only
+black_dom = []          # DOM to black out while chat is open, e.g. [".aplayer"]
+frame_width = "375px"   # iframe mode only
+frame_height = "600px"  # iframe mode only
 default_chat_questions = ["What topics do you cover?"]
 default_search_questions = []
+# Floating button position/size (optional empty = library default)
+left = ""
+bottom = ""
+width = ""
+height = ""
+fill = ""
+background_color = ""
 ```
 
 ## Post Summary AI
@@ -233,6 +253,8 @@ enable = true
 key = "your-key"  # Uses post_chat.key if not set
 title = "AI Summary"
 theme = ""  # "", "simple", "yanzhi", "menghuan"
+post_url = ""   # Override the page URL sent to the AI service
+blacklist = ""  # Comma-separated path prefixes to skip summaries
 word_limit = 1000
 typing_animate = true
 beginning_text = ""
@@ -242,7 +264,7 @@ loading_text = true
 ## Appearance (SCSS Overrides)
 
 Override theme colors and fonts. Values must be hex format (e.g., `"#ff0000"`),
-not CSS named colors.
+not CSS named colors. Empty string = theme default.
 
 ```toml
 [params.appearance]
@@ -264,12 +286,14 @@ global_font_color_dark = ""
 global_link_color_dark = ""
 ```
 
+See hugo.toml `[params.appearance]` for the full key list (scrollbar, selection, tag cloud, table, reward, pagination, code, github_corner, …).
+
 ## Reading Progress Bar
 
 ```toml
 [params.reading_progress]
 enable = true
-start = "left"
+start = "start"  # "start" or "end" — which edge the fill starts from (RTL-safe)
 position = "top"  # "top" or "bottom"
 reversed = false
 height = "2px"
@@ -289,11 +313,114 @@ theme = "minimal"
 
 ## Custom Partials
 
-Inject custom templates at specific hook points.
+Inject custom templates at open custom blocks. Partials live in `layouts/_partials/`.
+All keys are string arrays.
 
 ```toml
 [params.custom_partials]
-head = ["custom/head.html"]
-footer = ["custom/footer.html"]
-assets = ["custom/assets.html"]
+head = []
+menu_desktop = []
+menu_mobile = []
+profile = []
+aside = []
+comment = []
+footer = []
+widgets = []
+assets = []
+post_toc_before = []
+post_toc_after = []
+post_content_before = []
+post_content_after = []
+post_footer_before = []
+post_footer_after = []
+```
+
+Example: `head = ["custom/head.html"]` loads `layouts/_partials/custom/head.html`.
+
+## Third-Party Library Assets
+
+Load extra CSS/JS from local `assets/` or a remote URL. Key = unique id.
+
+```toml
+[params.library.css]
+someCSS = "css/some.css"                      # local asset
+otherCSS = "https://cdn.example.com/some.css" # remote
+
+[params.library.js]
+someJS = "js/some.js"
+otherJS = "https://cdn.example.com/some.js"
+```
+
+## Feed
+
+```toml
+[params.feed]
+limit = 10       # -1 = all posts
+full_text = true
+[params.feed.follow]  # follow.is site challenge
+feed_id = ""
+user_id = ""
+```
+
+Section/term feeds override via `[params.section.feed]` / `[params.list.feed]` (`limit`, `full_text`).
+
+## Print
+
+Expand collapsed UI before printing:
+
+```toml
+[params.print]
+expand_admonition = true
+expand_code = true
+expand_details = true
+expand_file_tree = false
+```
+
+## TypeIt
+
+Defaults for typeit shortcode / animated titles:
+
+```toml
+[params.typeit]
+speed = 100
+cursor_speed = 1000
+cursor_char = "|"
+duration = -1  # -1 = cursor stays
+loop = false
+```
+
+## Tag Cloud / Recently Updated
+
+```toml
+[params.tag_cloud]
+enable = false
+min = 14
+max = 32
+peak_count = 10
+orderby = "name"  # "name" or "count"
+
+[params.recently_updated]
+archives = true
+section = true
+list = true
+days = 30
+max_count = 10
+```
+
+## Back to Top / GitHub Corner / Compatibility
+
+```toml
+[params.back_to_top]
+enable = true
+scrollpercent = false
+
+[params.github_corner]
+enable = false
+permalink = "https://github.com/hugo-fixit/FixIt"
+title = "View source on GitHub"
+position = "end"  # "start" or "end"
+
+[params.compatibility]
+polyfill = false   # Polyfill.io for older browsers
+object_fit = false # object-fit-images for older browsers
 ```

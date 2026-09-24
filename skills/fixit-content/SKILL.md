@@ -6,15 +6,15 @@ description: >
   Use when writing FixIt posts with advanced content features.
 metadata:
   author: hugo-fixit
-  version: 2026.8.13
+  version: 2026.9.24
   source: Generated from https://github.com/hugo-fixit/FixIt and https://github.com/hugo-fixit/fixit-docs
 ---
 
 # FixIt Content Skill
 
-FixIt extends Hugo's content system with 30+ shortcodes, 7 render hooks, and custom markdown syntax for diagrams, charts, music players, encryption, and more.
+FixIt extends Hugo's content system with 29 shortcodes, 14 render hooks, and custom markdown syntax for diagrams, charts, music players, encryption, and more.
 
-Use code fence extended syntax (`` ```mermaid ``, `` ```echarts ``, `` ```timeline ``, `` ```file-tree ``) where available -- it is preferred over the shortcode form.
+Use code fence extended syntax (`` ```mermaid ``, `` ```echarts ``, `` ```timeline ``, `` ```file-tree ``, `` ```toggle ``) where available -- it is preferred over the shortcode form.
 
 Override any embedded shortcode by placing a file with the same name in `layouts/_shortcodes/`.
 
@@ -25,25 +25,31 @@ Override any embedded shortcode by placing a file with the same name in `layouts
 | Shortcode | Purpose | Key Params |
 | :-------- | :------ | :--------- |
 | `admonition` | Callout box (13 types) | `type`, `title`, `open` |
-| `tabs` / `tab` | Tabbed content | `type` (underline/pill/card/segment), `placement` |
+| `tabs` / `tab` | Tabbed content | `type` (underline/pill/card/segment), `placement` (top/bottom/start/end) |
 | `mermaid` | Diagrams | `wrapper`, `filename` |
 | `echarts` | Data visualization | `width`, `height`, `js`, `file`, `data` |
-| `timeline` | Chronological events | `reverse`, `animation`, `placement` |
-| `file-tree` | Directory structure | `path`, `level`, `file`, `data` |
-| `typeit` | Typing animation | `tag`, `code`, `group`, `loop`, `speed` |
-| `mapbox` | Interactive maps | `lng`, `lat`, `zoom`, `light-style`, `dark-style` |
-| `music` | Music player (APlayer) | `url`, `auto`, `server`, `id` |
-| `image` | Image with lightgallery | `src`, `alt`, `caption`, `linked`, `loading` |
-| `link` | Enhanced links | `href`, `content`, `card`, `download` |
-| `details` | Collapsible section | `summary`, `open` |
+| `timeline` | Chronological events | `reverse`, `animation`, `placement`, `width`, `height`, `class`, `data`, `file` |
+| `file-tree` | Directory structure | `path`, `level`, `name`, `file`, `data` |
+| `typeit` | Typing animation | `tag`, `code`, `code-link`, `class`, `group`, `loop`, `speed` |
+| `mapbox` | Interactive maps | `lng`, `lat`, `zoom`, `light-style`, `dark-style`, `width`, `height` |
+| `music` | Music player (APlayer) | `url`, `auto`, or `server`/`type`/`id` |
+| `aplayer` / `audio` | Advanced APlayer playlist | `mini`, `fixed`, `autoplay`; `audio` needs `name`, `artist`, `url`, `cover` |
+| `image` | Image with lightgallery | `src`, `alt`, `caption`, `linked`, `loading`, `title`, `class` |
+| `link` | Enhanced links | `href`, `content`, `title`, `card`, `download`, `class`, `rel` |
+| `details` | Collapsible section | `summary`, `open`, `name`, `title`, `class` |
 | `fixit-encryptor` | Partial encryption | `password`, `message` |
 | `gist` | GitHub Gist embed | username, gist-id, filename |
 | `script` | Inline JavaScript | (content body) |
 | `style` | Inline CSS/SCSS | style string, tag |
-| `reward` | Donation buttons | `wechatpay`, `alipay`, `paypal` |
-| `bluesky` | Bluesky post embed | post URL |
+| `reward` | Donation buttons | `wechatpay`, `alipay`, `paypal`, `bitcoin` |
+| `auto-dark` | Auto invert colors in dark mode | (content body) |
+| `raw` | Skip Markdown/HTML rendering | wrapper tag |
+| `center-quote` | Centered blockquote | (content body) |
+| `env` | Render by Hugo environment | environment name |
+| `version` | Version badge | version, `changed`/`deprecated`/`deleted` |
+| `bluesky` | Bluesky post embed | `link` (named only) |
 | `bilibili` / `douyin` | Video embeds | video ID |
-| `spotify` | Spotify embed | spotify URL |
+| `spotify` | Spotify embed | `type`, `id` (or positional) |
 
 ### Extended Markdown
 
@@ -60,6 +66,8 @@ Override any embedded shortcode by placing a file with the same name in `layouts
 | Superscript | `2^10^` | 2^10 |
 | Task list | `- [x] Done` | Checkbox with status |
 | Color preview | `` `#0969DA` `` | Inline color swatch |
+
+Mark / Insert require Hugo >= 0.128.0 with `[markup.goldmark.extensions.extras]` enabled (`delete`, `insert`, `mark`, `subscript`, `superscript`).
 
 ## Common Examples
 
@@ -112,6 +120,6 @@ console.log('Hello');
 
 | Topic | Description | Reference |
 | :---- | :---------- | :-------- |
-| Shortcodes | All 30+ extended shortcodes with syntax and examples | [references/shortcodes.md](references/shortcodes.md) |
+| Shortcodes | All 29 extended shortcodes with syntax and examples | [references/shortcodes.md](references/shortcodes.md) |
 | Render Hooks | Code blocks, headings, images, links, tables, blockquotes, passthrough | [references/render-hooks.md](references/render-hooks.md) |
 | Content Features | Front matter fields, extended markdown, content organization | [references/content-features.md](references/content-features.md) |

@@ -1,10 +1,13 @@
 <!-- source: fixit-docs/content/en/documentation/content-management/shortcodes/extended/introduction/index.md -->
+<!-- source: FixIt/layouts/_shortcodes/ -->
 
 # Extended Shortcodes Reference
 
-FixIt provides 30+ shortcodes on top of Hugo's built-in ones. Use code fence extended syntax (`` ```mermaid ``, `` ```echarts ``, etc.) where available -- it is preferred over the shortcode form.
+FixIt provides 29 shortcodes on top of Hugo's built-in ones. Use code fence extended syntax (`` ```mermaid ``, `` ```echarts ``, etc.) where available -- it is preferred over the shortcode form.
 
 Override any embedded shortcode by placing a file with the same name in `layouts/_shortcodes/`.
+
+Delimiters: use `{{% %}}` for shortcodes that process Markdown content (`tab`, `fixit-encryptor`); use `{{< >}}` for all others.
 
 ---
 
@@ -42,7 +45,7 @@ Wrap content to auto-invert colors for dark mode.
 
 ### raw
 
-Prevent Markdown/HTML rendering of content. First param: wrapper tag (default `div`).
+Prevent Markdown/HTML rendering of content. First param: wrapper tag (default `div`). Named form: `tag`.
 
 ```markdown
 Raw content: {{< raw "span" >}}**Hello** <strong>FixIt</strong>{{< /raw >}}
@@ -60,7 +63,7 @@ This only renders in production.
 
 ### version
 
-Display a version badge. Params: tag (required), type (new/changed/deleted/deprecated), URL prefix, project name.
+Display a version badge. Params: version (required), type (`new`/`changed`/`deleted`/`deprecated`, default `new`), URL prefix, project name.
 
 ```markdown
 {{< version 1.0.0 >}}
@@ -73,16 +76,23 @@ Display a version badge. Params: tag (required), type (new/changed/deleted/depre
 
 ### link
 
-Enhanced link with card mode and download support. Positional: href, content, title, card, card-icon.
+Enhanced link with card mode and download support.
+
+- Named: `href`, `content`, `title`, `class`, `rel`, `download`, `card`, `card-icon`, `external-icon`, `noreferrer`, `isGuarded`
+- Positional: href, content, title, card, card-icon
 
 ```markdown
 {{< link "https://github.com/hugo-fixit/FixIt" "FixIt Theme" "visit" true >}}
 {{< link href="/file.pdf" content="Download" download="file.pdf" >}}
+{{< link href="https://example.com" content="Site" class="btn" rel="author" external-icon=false isGuarded=true >}}
 ```
 
 ### image
 
-Image shortcode with lightgallery support. Positional: src, alt, caption. Named: `linked`, `loading` (lazy/eager), `optimise`, `cacheRemote`.
+Image shortcode with lightgallery support.
+
+- Positional: src, alt, caption
+- Named: `src`, `alt`, `caption`, `title`, `height`, `width`, `linked` (default `true`), `rel`, `class`, `loading` (lazy/eager), `optimise`, `cacheRemote`
 
 ```markdown
 {{< image src="/images/photo.jpg" caption="A photo" loading="lazy" >}}
@@ -90,11 +100,18 @@ Image shortcode with lightgallery support. Positional: src, alt, caption. Named:
 
 ### details
 
-Collapsible HTML `<details>` element. Positional: summary, open, class.
+Collapsible HTML `<details>` element.
+
+- Positional: summary, open, class
+- Named: `summary` (default `Details`), `open`, `class`, `name` (exclusive accordion group), `title`
 
 ```markdown
 {{< details "Click to expand" true >}}
 Hidden content here.
+{{< /details >}}
+
+{{< details summary="Grouped" name="my-details" >}}
+Only one open at a time within the same `name`.
 {{< /details >}}
 ```
 
@@ -141,7 +158,10 @@ Preferred: use blockquote alert syntax for cross-platform compatibility:
 
 ### tabs / tab
 
-Tabbed content container. `tabs` params: `type` (underline/pill/card/segment), `placement` (top/bottom/left/right), `defaultTab`. `tab` params: `title`.
+Tabbed content container.
+
+- `tabs` params: `type` (underline/pill/card/segment), `placement` (`top`/`bottom`/`start`/`end`; `left`/`right` deprecated), `defaultTab` (0-based index)
+- `tab` params: `title` (must use `{{% %}}` so the body is processed as Markdown)
 
 ```markdown
 {{< tabs type="card" >}}
@@ -163,7 +183,7 @@ console.log('Hello');
 
 ### typeit
 
-Typing animation. Params: `tag`, `code` (language for syntax highlighting), `group` (sequential animation), `loop`, `speed`, `cursorSpeed`, `cursorChar`, `duration`.
+Typing animation. Params: `tag`, `code` (language for syntax highlighting), `code-link` (parse Markdown links in code), `class`, `group` (sequential animation; forces `loop` false), `loop`, `speed`, `cursorSpeed`, `cursorChar`, `duration`.
 
 ```markdown
 {{< typeit tag=h4 >}}
@@ -192,7 +212,7 @@ Grouped (sequential):
 
 ### timeline
 
-Chronological events. Data in YAML/JSON/TOML. Params: `reverse`, `animation`, `placement` (top/bottom), `size`, `node` (circle/dot).
+Chronological events. Data in YAML/JSON/TOML. Params: `reverse`, `animation`, `placement` (top/bottom), `size`, `node` (circle/dot), `width`, `height`, `class`, `data`, `file`.
 
 ```markdown
 {{< timeline animation=true >}}
@@ -210,10 +230,10 @@ Also available via code fence: `` ```timeline ``.
 
 ### file-tree
 
-Interactive directory tree. Data sources (priority): inline body, `file` param, `data` param, filesystem `path`. Params: `level` (expand depth, -1=all, 0=collapse), `folder_slash`, `ignore_list`, `highlight_list`.
+Interactive directory tree. Data sources (priority): inline body, `file` param, `data` param, filesystem `path`. Params: `path`, `level` (expand depth, -1=all, 0=collapse), `name` (root node label; `{path}` uses full root path), `folder_slash`, `ignore_list`, `highlight_list`, `file`, `data`.
 
 ```markdown
-{{< file-tree path="src" level=2 >}}
+{{< file-tree path="src" level=2 name="my-project" >}}
 ```
 
 Inline YAML:
@@ -267,24 +287,33 @@ JS mode (`js=true`): content is a function body returning the option object. Pre
 
 ### mapbox
 
-Interactive map. Params: `lng`, `lat`, `zoom`, `marked`, `light-style`, `dark-style`, `markers`, `navigation`.
+Interactive map.
+
+- Positional: lng, lat, zoom, marked, light-style, dark-style, markers
+- Named: `lng`, `lat`, `zoom`, `marked`, `light-style`, `dark-style`, `markers`, `navigation`, `geolocate`, `scale`, `fullscreen`, `width` (default `100%`), `height` (default `20rem`)
 
 ```markdown
 {{< mapbox 121.473701 31.230416 11 >}}
+{{< mapbox lng=121.473701 lat=31.230416 zoom=11 geolocate=true fullscreen=true width="100%" height="20rem" >}}
 ```
 
 ### music
 
-Music player (APlayer + MetingJS). Three modes: custom URL, auto-detect platform URL, or server/type/id.
+Music player (APlayer + MetingJS). Three modes:
+
+1. Custom URL: `url`, `name`, `artist`, `cover` (+ `fixed`, `mini`, `autoplay`, `volume`, `mutex`)
+2. Auto-detect platform URL: `auto` (or positional URL)
+3. Server mode: `server`, **`type` (required)**, `id` (or positional `server type id`)
 
 ```markdown
 {{< music url="/music/song.mp3" name="Song" artist="Artist" cover="/images/cover.jpg" >}}
 {{< music "https://music.163.com/#/playlist?id=60198" >}}
+{{< music server="netease" type="song" id="1868553" >}}
 ```
 
 ### aplayer / audio
 
-Advanced APlayer controls with custom playlist and mini mode.
+Advanced APlayer controls with custom playlist and mini mode. Both support **named params only**. `audio` must be nested inside `aplayer`.
 
 ```markdown
 {{< aplayer mini=true >}}
@@ -292,29 +321,38 @@ Advanced APlayer controls with custom playlist and mini mode.
 {{< /aplayer >}}
 ```
 
+`aplayer` params: `fixed`, `mini`, `autoplay`, `theme`, `loop`, `order`, `preload`, `volume`, `mutex`, `lrcType`, `listFolded`, `listMaxHeight`, `storageName`.
+`audio` params: `name`, `artist`, `url`, `cover`, `lrc` (or LRC body; then set `lrcType=1`).
+
 ### spotify
 
-Spotify embed.
+Spotify embed. Requires `type` + `id` (named or positional).
 
 ```markdown
-{{< spotify "https://open.spotify.com/track/xxx" >}}
+{{< spotify type=artist id=74ASZWbe4lXaubB36ztrGX >}}
+{{< spotify artist 74ASZWbe4lXaubB36ztrGX >}}
+{{< spotify type=track id=xxx width="100%" height="380" >}}
 ```
+
+- `type` (required): `artist`, `album`, `track`, or `playlist`
+- `id` (required): Spotify ID from the URL
+- `width` (optional, default `100%`), `height` (optional, default `380`)
 
 ### bilibili / douyin
 
-Video embeds.
+Video embeds. `bilibili`: `id`/positional BV id, plus `p`, `autoplay`, `poster`, `muted`, `danmaku`, `t`. `douyin`: `id`/positional video id (required).
 
 ```markdown
 {{< bilibili BV1xx411c7mD >}}
-{{< douyin "https://www.douyin.com/video/xxx" >}}
+{{< douyin id="xxx" >}}
 ```
 
 ### bluesky
 
-Bluesky post embed.
+Bluesky post embed. **Named param `link` only** (no positional form).
 
 ```markdown
-{{< bluesky "https://bsky.app/profile/xxx/post/xxx" >}}
+{{< bluesky link="https://bsky.app/profile/bsky.app/post/3latotljnec2h" >}}
 ```
 
 ### gist
@@ -331,7 +369,7 @@ GitHub Gist embed. Positional: username, gist-id, filename (optional).
 
 ### fixit-encryptor
 
-Encrypt partial content with a password. Positional: password, message. Supports infinite nesting.
+Encrypt partial content with a password. Positional: password, message. Supports infinite nesting. Body is Markdown -- use `{{% %}}`.
 
 ```markdown
 {{% fixit-encryptor "mypassword" "Enter password to view" %}}

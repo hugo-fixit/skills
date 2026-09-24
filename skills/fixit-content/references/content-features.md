@@ -41,7 +41,7 @@ ruby: true               # Enable ruby annotation syntax
 fraction: true           # Enable fraction syntax
 fontawesome: true        # Enable Font Awesome icon syntax
 twemoji: true            # Enable Twemoji support
-page_style: "default"    # Page style variant
+page_style: "normal"     # "narrow" | "normal" (default) | "wide"
 
 # Behavior
 auto_bookmark: true      # Auto bookmark heading on scroll
@@ -56,10 +56,11 @@ math:
   enable: true           # Enable math rendering
   type: "katex"          # katex or mathjax
 
-# Code
-code:
-  copy: true             # Copy button on code blocks
-  maxShownLines: 10      # Collapse code after N lines
+# Code block ([params.codeblock] -- snake_case keys)
+codeblock:
+  copyable: true         # Copy button on code blocks
+  max_shown_lines: 10    # Collapse code after N lines (maxShownLines is deprecated)
+  mode: "classic"        # classic | mac | simple
 
 # Encryption (page-level)
 password: "1212"         # Page encryption password
@@ -67,15 +68,17 @@ message: "Enter password"  # Encryption prompt message
 ---
 ```
 
+> `code.copy` / `code.maxShownLines` are wrong; use `codeblock.copyable` / `codeblock.max_shown_lines`. CamelCase keys emit deprecation warnings since v1.0.0.
+
 ### Featured Images
 
 ```yaml
 ---
-# Method 1: Direct paths
-featuredImage: cover.jpg
-featuredImagePreview: cover-preview.jpg
+# Method 1: Direct paths (snake_case; camelCase featuredImage* is deprecated since v1.0.0)
+featured_image: cover.jpg
+featured_image_preview: cover-preview.jpg
 
-# Method 2: Page resources (equivalent)
+# Method 2: Page resources (equivalent, no front matter fields needed)
 resources:
   - name: featured-image
     src: cover.jpg
@@ -84,7 +87,11 @@ resources:
 ---
 ```
 
-Featured images support local resource references in page bundles.
+Resolution order: `featured_image_preview` (or `featured_image`) front matter -> page resource `featured-image-preview` / `featured-image` -> global `assets/` path. Supports remote URLs and inline data URIs.
+
+### Archetype Fields (`archetypes/posts.md`)
+
+`hugo new posts/my-post.md` seeds these fields: `title`, `subtitle`, `date`, `slug`, `draft`, `description`, `keywords`, `weight`, `categories`, `collections`, `tags`, `summary`, `featured_image`, `featured_image_preview`, `password`, `message`, `repost` (`repost.enable`, `repost.url`). Use `hugo new --kind post-bundle` for page bundles.
 
 ### Visibility Control
 
@@ -210,6 +217,8 @@ Require Hugo >= 0.128.0 with extras enabled in `hugo.toml`. Set `strikethrough =
 
 Typed marks: `primary`, `secondary`, `success`, `info`, `warning`, `danger`. Custom types via CSS class `.mark-{name}`.
 
+Insert and Mark require goldmark extras (not available with plain Goldmark defaults).
+
 ### Task Lists
 
 ```markdown
@@ -290,8 +299,8 @@ hugo new posts/my-post.md          # Single page
 hugo new --kind post-bundle posts/my-bundle/  # Page bundle with resources
 ```
 
-Archetypes auto-populate front matter with FixIt defaults.
+Archetypes auto-populate front matter with FixIt defaults (`subtitle`, `weight`, `slug`, `repost`, `featured_image`, ...).
 
 ### Local Resource References
 
-Shortcodes that support local resources: `image`, `link`, `music`, `echarts`, `timeline`, `file-tree`. These resolve paths relative to the page bundle first, then fall back to the `assets/` directory.
+Shortcodes that support local resources: `image`, `link`, `music`, `aplayer`/`audio`, `echarts`, `timeline`, `file-tree`. These resolve paths relative to the page bundle first, then fall back to the `assets/` directory.

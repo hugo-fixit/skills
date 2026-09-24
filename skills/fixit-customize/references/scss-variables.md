@@ -1,5 +1,5 @@
-<!-- Source: https://github.com/hugo-fixit/FixIt/blob/master/assets/scss/_variables.scss -->
-<!-- Source: https://github.com/hugo-fixit/FixIt/blob/master/assets/scss/core/mixins/_theme-vars.scss -->
+<!-- source: assets/scss/_variables.scss:1-21 -->
+<!-- source: assets/scss/core/mixins/_theme-vars.scss:1-84 -->
 
 # SCSS Variables and Mixins Reference
 
@@ -34,6 +34,9 @@ $rootPrefix: --#{$prefix} !default;  // yields --fi-
 $header-height: 3.5rem !default;
 ```
 
+Always reference custom properties via the `fi-var()` function (auto-adds the `--fi-`
+prefix). Never write `var(--fi-...)` by hand in theme/user SCSS.
+
 ## CSS Custom Properties
 
 All theme variables are exposed as CSS custom properties with the `--fi-` prefix.
@@ -49,6 +52,20 @@ These enable runtime theme switching without recompiling SCSS.
 `--fi-single-link-color`, `--fi-code-color`, `--fi-code-block-background-color`,
 `--fi-table-background-color`, `--fi-blockquote-color`, `--fi-selection-color`,
 `--fi-scrollbar-color`.
+
+## Theme Switching at Runtime
+
+A few lines of context when writing theme-aware custom code:
+
+- Site default comes from `default_theme` in `hugo.toml` (`"auto" | "light" | "dark"`).
+- On first paint, `assets/js/head/color-scheme.ts` reads localStorage key `theme-mode`
+  (falling back to `default_theme`) and sets `<html data-theme-mode="auto|light|dark">`
+  to avoid a flash of wrong theme.
+- CSS `color-scheme` follows `data-theme-mode`, so `light-dark()` variables flip with it.
+- At runtime call `fixit.setThemeMode(mode, persist?)`; it updates `data-theme-mode`,
+  optionally writes localStorage, and emits `fixit:switch-theme`.
+- Prefer `define-theme-vars` / `light-dark()` for colors; use `light-mode`/`dark-mode`
+  mixins only for non-color differences.
 
 ## Creating custom.scss
 
@@ -68,15 +85,15 @@ theme's styles and has access to all mixins and variables.
 
 // Custom styles using theme variables
 .my-custom-class {
-  color: var(--fi-global-link-color);
-  border-radius: var(--fi-global-border-radius);
+  color: fi-var(global-link-color);
+  border-radius: fi-var(global-border-radius);
 }
 ```
 
 ## Creating custom.ts
 
-Create `assets/js/custom.ts` (or `custom.js`) in your project root. It runs at the end
-of each page load.
+Create `assets/js/custom.ts` (or `custom.js`) in your project root. It runs deferred at
+the end of each page load. Access the public API on `window.fixit`.
 
 ```typescript
 // assets/js/custom.ts
@@ -90,11 +107,30 @@ class CustomScript {
   init() {
     console.log('FixIt version:', fixit.version)
 
+    // Theme control: 'auto' | 'light' | 'dark'; 2nd arg persists to localStorage
+    // fixit.setThemeMode('dark')
+    // fixit.setThemeMode('auto', true)
+
     fixit.eventBus.on('fixit:switch-theme', ({ detail }: any) => {
+      // detail: { mode: string, isDark: boolean, isChanged: boolean }
       console.log('Theme switched to:', detail.mode)
     })
 
-    fixit.refresh()
+    // Scroll / resize are events, not getters
+    fixit.eventBus.on('fixit:scroll', () => {
+      // e.g. read window.scrollY yourself and react
+    })
+
+    // Mask overlay (menu/search drawers use the same system)
+    fixit.core.registerMaskOverlay('my-overlay', {
+      isActive: () => false,
+      onOpen: () => {},
+      onClose: () => {},
+    })
+
+    // Re-initialize theme content handlers after injecting HTML.
+    // Note: fixit.refresh() does NOT exist — use content.initContent().
+    fixit.content.initContent()
   }
 }
 
@@ -102,6 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
   void new CustomScript()
 })
 ```
+
+Public API surface (`window.fixit`): `version`, `config`, `themeMode`, `isDark`, `isRTL`,
+`setThemeMode(mode, persist?)`, modules `core` / `theme` / `code` / `toc` / `menu` /
+`search` / `enc` / `pwa` / `misc` / `content` / `events`, and `eventBus` (`on`/`off`/`emit`).
 
 ## Available SCSS Mixins
 
@@ -136,7 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 ```
 
-Then set `page_style = "custom"` in `hugo.toml`.
+Then set `page_style = "custom"` as a page-level param (top-level under `[params]` or in
+front matter) -- not under `[params.appearance]`.
 
 ### `admonition` -- Custom Admonition Types
 
@@ -170,11 +211,20 @@ li[data-task='tip'] {
 }
 ```
 
-Register the icon in `hugo.toml`:
+Register the icon in `hugo.toml` (config key is snake_case `task_list`):
 
 ```toml
-[params.taskList]
+[params.task_list]
 tip = "fa-regular fa-lightbulb"
+```
+
+Optional default title goes in the i18n language file. The i18n table is camelCase
+`[taskList]` -- not `[task-list]`, and not the same key as `params.task_list`:
+
+```toml
+# i18n/en.toml (or your site's i18n override)
+[taskList]
+tip = "Tip"
 ```
 
 ### `set-fi-var` / `set-fi-vars` -- Set CSS Custom Properties

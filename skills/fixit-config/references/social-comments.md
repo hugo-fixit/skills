@@ -182,6 +182,31 @@ avatar = "mp"
 visitor = true
 ```
 
+### Facebook Comments
+
+```toml
+[params.comment.facebook]
+enable = true
+width = "100%"
+num_posts = 10
+app_id = "your-facebook-app-id"
+language_code = ""
+```
+
+### Telegram Comments
+
+```toml
+[params.comment.telegram]
+enable = true
+site_id = "your-comments-site-id"
+limit = 5
+height = ""
+color = ""
+colorful = true
+dislikes = false
+outlined = false
+```
+
 ## Share Buttons
 
 Control which share buttons appear on post pages.
@@ -191,11 +216,12 @@ Control which share buttons appear on post pages.
 enable = true
 Twitter = true
 Facebook = true
-Reddit = true
 Weibo = true
-Linkedin = true
-# Also available: Whatsapp, Pinterest, Tumblr, HackerNews, VK, Buffer,
-# Xing, Line, Instapaper, Pocket, Flipboard, Blogger, Baidu, etc.
+# Defaults false (opt-in): Linkedin, Reddit, Whatsapp, Pinterest, Tumblr,
+# HackerNews, VK, Buffer, Xing, Line, Instapaper, Pocket, Flipboard,
+# Myspace, Blogger, Baidu, Odnoklassniki, Evernote, Skype, Trello, Mix
+Linkedin = false
+Reddit = false
 ```
 
 ## Reward / Donate
@@ -228,6 +254,10 @@ enable = true
 [params.analytics.google]
 id = "G-XXXXXXXXXX"
 anonymize_ip = true
+
+[params.analytics.fathom]
+id = "your-fathom-site-id"
+server = ""  # self-hosted tracker URL
 
 [params.analytics.baidu]
 id = "your-baidu-tracking-id"

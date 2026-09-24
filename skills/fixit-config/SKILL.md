@@ -6,14 +6,17 @@ description: >
   a FixIt site, adding features, or troubleshooting theme settings.
 metadata:
   author: hugo-fixit
-  version: 2026.8.5
+  version: 2026.9.24
   source: Generated from https://github.com/hugo-fixit/FixIt and https://github.com/hugo-fixit/fixit-docs
 ---
 
 # FixIt Configuration Skill
 
-FixIt stores all theme settings under `[params]` in `hugo.toml`. The theme ships a
-default `hugo.toml` (1700+ lines) that users copy into their project root and customize.
+FixIt is configured in the site `hugo.toml`. Theme settings live mainly under
+`[params]`; markup under `[markup]`, menus under `[menu]`, plus top-level Hugo keys
+(`[outputs]`, `[outputFormats]`, `[taxonomies]`, `[sitemap]`, `[privacy]`, …).
+The theme ships a default `hugo.toml` (1900+ lines) that users copy into their
+project root and customize.
 
 ## Configuration Structure
 
@@ -41,9 +44,9 @@ _merge = "shallow"
 | `[params.header]` | Header mode, title, subtitle, blur |
 | `[params.footer]` | Footer content, copyright, powered-by, site_time |
 | `[params.home]` | Home page profile and posts section |
-| `[params.search]` | Search engine (fuse, algolia, pagefind, cse) |
-| `[params.comment]` | Comment systems (Giscus, Waline, Twikoo, Disqus, etc.) |
-| `[params.analytics]` | Google, Baidu, Umami, Plausible, Cloudflare |
+| `[params.search]` / `[params.cse]` | Search engine (fuse, algolia, pagefind, cse) |
+| `[params.comment]` | Comment systems (Giscus, Waline, Twikoo, Disqus, Facebook, Telegram, etc.) |
+| `[params.analytics]` | Google, Fathom, Baidu, Umami, Plausible, Cloudflare |
 | `[params.social]` | 80+ social link platforms |
 | `[params.codeblock]` | Code block wrapper, mode, copy, fullscreen, edit |
 | `[params.math]` | KaTeX or MathJax rendering |
@@ -57,8 +60,8 @@ _merge = "shallow"
 
 | Topic | Description | Reference |
 | ------- | ------------- | ----------- |
-| Params Basics | Site-level params, author, page-level, date, image | [params-basics.md](references/params-basics.md) |
-| Params Advanced | Codeblock, math, mermaid, mapbox, encryption, watermark, AI features | [params-advanced.md](references/params-advanced.md) |
+| Params Basics | Site-level params, author, page-level, date, image, search, links | [params-basics.md](references/params-basics.md) |
+| Params Advanced | Codeblock, math, mermaid, mapbox, encryption, watermark, AI, custom partials, library, feed/print/typeit | [params-advanced.md](references/params-advanced.md) |
 | Markup Config | Goldmark, Chroma, render hooks, output formats, taxonomies | [markup-config.md](references/markup-config.md) |
 | Social & Comments | Social links, comment systems, share, reward, analytics | [social-comments.md](references/social-comments.md) |
 

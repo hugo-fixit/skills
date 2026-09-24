@@ -6,93 +6,97 @@ Goldmark, Chroma syntax highlighting, render hooks, output formats, and taxonomi
 
 ## Goldmark (Markdown)
 
-Enable extended Markdown syntax: delete, insert, mark, subscript, superscript.
+Extended syntax lives under `[markup.goldmark.extensions.extras]`, each with its own
+`enable` key (Hugo >= 0.128). Top-level extension flags (`strikethrough`, `table`, …)
+stay under `[markup.goldmark.extensions]`.
 
 ```toml
-[markup.goldmark]
 [markup.goldmark.extensions]
-# ~~strikethrough~~
-delete = true
-# ++inserted++
-insert = true
-# ==highlighted==
-mark = true
-# H~2~O subscript
-subscript = true
-# X^2^ superscript
-superscript = true
-# Typographer replaces quotes, dashes, etc.
+# GFM ~~strikethrough~~ — FixIt disables it so extras `delete` is the primary delete syntax
+strikethrough = false
 typographer = true
 
-[markup.goldmark.parser]
-# Allow unsafe HTML in Markdown
-unsafe = true
-# Auto-generate heading IDs
-autoHeadingID = true
-autoHeadingIDType = "github"
+[markup.goldmark.extensions.extras.delete]
+enable = true
+
+[markup.goldmark.extensions.extras.insert]
+enable = true
+
+[markup.goldmark.extensions.extras.mark]
+enable = true
+
+[markup.goldmark.extensions.extras.subscript]
+enable = true
+
+[markup.goldmark.extensions.extras.superscript]
+enable = true
+
+[markup.goldmark.parser.attribute]
+block = true
+title = true
 
 [markup.goldmark.renderer]
-# Enable raw HTML in Markdown
+# Allow raw HTML in Markdown (required for many FixIt shortcodes/partials)
 unsafe = true
 ```
 
+Why: `strikethrough` and `delete` are different extensions. Keep `strikethrough = false`
+when relying on extras `delete` (`--text--`). Put `unsafe` under `[markup.goldmark.renderer]`,
+not `[markup.goldmark.parser]`.
+
 ## Passthrough for Math
 
-Enable math delimiters so KaTeX/MathJax can process inline and block math.
+Enable math delimiters so KaTeX/MathJax can process inline and block math. Use literal
+TOML strings so backslashes survive. Order matters only for matching preference —
+prefer the escaped-delim pairs first as in the theme default.
 
 ```toml
 [markup.goldmark.extensions.passthrough]
 enable = true
 
 [markup.goldmark.extensions.passthrough.delimiters]
-inline = [["$", "$"], ["\(", "\)"]]
-block = [["$$", $$"], ["\[", "\]"]]
+block = [['\[', '\]'], ['$$', '$$']]
+inline = [['\(', '\)'], ['$', '$']]
 ```
 
 ## Chroma Syntax Highlighting
 
-FixIt requires these Chroma settings for the code block wrapper to work correctly.
+FixIt requires these Chroma settings for the code block wrapper and theme switching.
 
 ```toml
 [markup.highlight]
-# Enable code fences
 codeFences = true
-# Show line numbers
-lineNos = true
-# Line numbers in a table (better copy behavior)
-lineNumbersInTable = true
-# Use CSS classes instead of inline styles (required for theme switching)
+# Use CSS classes instead of inline styles (required for light/dark themes)
 noClasses = false
-# Style for code without classes (fallback)
-# noClasses = true would use inline styles
+anchorLineNos = false
 guessSyntax = true
-# Max lines before wrapping
-lineNosInTable = true
-# Tab width
-tabWidth = 4
+lineNos = true
+lineNumbersInTable = true
 ```
 
-The `noClasses = false` setting is critical. It lets FixIt's SCSS control syntax
-highlighting colors for both light and dark themes via CSS classes.
+Why: `noClasses = false` lets FixIt SCSS own syntax colors. `lineNumbersInTable`
+gives correct copy behavior. Do not use `lineNosInTable` / `tabWidth` — they are not
+valid `[markup.highlight]` keys.
 
 ## Render Hooks
 
-FixIt provides custom render hooks for enhanced Markdown rendering:
+Built-in (override by placing files in `layouts/_markup/`):
 
-- **Code blocks** -- Custom wrapper with copy, fullscreen, edit buttons
-- **Headings** -- Anchor links, numbering, copy-to-clipboard
-- **Images** -- Lightgallery integration, lazy loading
-- **Links** -- External icon, link guard
-- **Tables** -- Responsive wrapper
-- **Blockquotes** -- Alert callouts (note, tip, warning, danger)
-- **Passthrough** -- Math delimiters for KaTeX/MathJax
+- **Code blocks** -- wrapper with copy, fullscreen, edit buttons
+- **Headings** -- anchor links, numbering, copy-to-clipboard
+- **Images** -- lightgallery, lazy loading
+- **Links** -- external icon, link guard
+- **Tables** -- responsive wrapper
+- **Blockquotes** -- alert callouts (note, tip, warning, danger)
+- **Passthrough** -- math delimiters for KaTeX/MathJax
 
-These are built into the theme. No configuration needed unless you want to override them
-with custom partials in `layouts/_markup/`.
+No config needed unless you override them.
 
 ## Output Formats
 
-The theme requires custom output formats for special pages. Include these in your config:
+Theme custom formats. Prefer `_merge = "shallow"` and only override what you need.
+Special formats use `notAlternative = true` so they stay out of alternate links
+(archives, offline, link, readme, baidu_urls, llms).
 
 ```toml
 [outputFormats]
@@ -104,6 +108,7 @@ mediaType = "text/html"
 isPlainText = false
 isHTML = true
 permalinkable = true
+notAlternative = true
 
 [outputFormats.offline]
 path = "offline"
@@ -112,6 +117,7 @@ mediaType = "text/html"
 isPlainText = false
 isHTML = true
 permalinkable = true
+notAlternative = true
 
 [outputFormats.link]
 path = "link"
@@ -120,10 +126,13 @@ mediaType = "text/html"
 isPlainText = false
 isHTML = true
 permalinkable = true
+notAlternative = true
 
+# PWA manifest — baseName is "site" (emits site.webmanifest)
 [outputFormats.manifest]
-baseName = "manifest"
+baseName = "site"
 mediaType = "application/manifest+json"
+rel = "manifest"
 isPlainText = true
 isHTML = false
 
@@ -134,9 +143,19 @@ rel = "search"
 isPlainText = true
 isHTML = false
 permalinkable = true
-```
 
-Then configure which outputs to generate:
+# AI-friendly llms.txt — add "llms" to home outputs to enable
+[outputFormats.llms]
+baseName = "llms"
+mediaType = "text/plain"
+isPlainText = true
+isHTML = false
+notAlternative = true
+
+# Optional extras (also notAlternative = true):
+# [outputFormats.readme]   baseName = "readme"     mediaType = "text/markdown"
+# [outputFormats.baidu_urls] baseName = "baidu_urls" mediaType = "text/plain"
+```
 
 ```toml
 [outputs]
@@ -147,7 +166,7 @@ taxonomy = ["html"]
 term = ["html", "rss"]
 ```
 
-Or use `_merge = "shallow"` to inherit from the theme:
+Or inherit from the theme:
 
 ```toml
 [outputs]
@@ -156,7 +175,7 @@ _merge = "shallow"
 
 ## Taxonomies
 
-FixIt has three built-in taxonomies: categories, tags, and collections.
+Three built-ins: categories, tags, collections.
 
 ```toml
 [taxonomies]
@@ -165,14 +184,14 @@ tag = "tags"
 collection = "collections"
 ```
 
-Or inherit from the theme:
+Or inherit:
 
 ```toml
 [taxonomies]
 _merge = "shallow"
 ```
 
-Use in front matter:
+Front matter:
 
 ```yaml
 ---
@@ -184,7 +203,7 @@ collections: ["Getting Started"]
 
 ## Taxonomy Icons
 
-Override icons for taxonomy title, card, and term title slots.
+Override icons for taxonomy title, card, and term title slots. Requires `[taxonomies]`.
 
 ```toml
 [params.taxonomy_icons]
@@ -196,24 +215,23 @@ category = [
 ]
 ```
 
-Requires `[taxonomies]` to be configured first.
-
 ## Table Configuration
 
-```toml
-[markup.table]
-# Enable sortable tables
-# Not built-in, use shortcodes or custom partials
-```
+Tables are built in. Responsive wrapper is automatic; numbering/sorting are theme params.
 
-FixIt wraps tables in a responsive container automatically.
+```toml
+[params.table]
+number = false  # auto table numbering
+sort = true     # clickable column sort
+```
 
 ## Goldmark Extensions Checklist
 
-| Extension | Syntax | Example |
-| ----------- | -------- | --------- |
-| Delete | `~~text~~` | ~~deleted~~ |
-| Insert | `++text++` | ++inserted++ |
-| Mark | `==text==` | ==highlighted== |
-| Subscript | `H~2~O` | H~2~O |
-| Superscript | `X^2^` | X^2^ |
+| Extension | Config key | Syntax | Example |
+| --------- | ---------- | ------ | ------- |
+| Strikethrough (GFM) | `extensions.strikethrough` | `~~text~~` | FixIt default is **off** |
+| Delete (extras) | `extensions.extras.delete` | `--text--` | --deleted-- |
+| Insert (extras) | `extensions.extras.insert` | `++text++` | ++inserted++ |
+| Mark (extras) | `extensions.extras.mark` | `==text==` | ==highlighted== |
+| Subscript (extras) | `extensions.extras.subscript` | `H~2~O` | H~2~O |
+| Superscript (extras) | `extensions.extras.superscript` | `X^2^` | X^2^ |
